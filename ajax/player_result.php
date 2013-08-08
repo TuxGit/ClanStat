@@ -53,7 +53,7 @@
 <script type="text/javascript" id="js">
    $(document).ready(function()
    {  $("#t-table1")
-      <? for ($i=2; $i<=13; $i++) {?>
+      <? for ($i=2; $i<=14; $i++) {?>
               .add("#t-table<?=$i;?>")
       <? } ;?>
       .tablesorter({
@@ -203,7 +203,8 @@ if (count($b_player_all) >1) {
            If (isset($tanks[0][$id.'_t'])) {
 
               if (($tanks[count($tanks)-1][$id.'_t'] == '0')&&($tanks[0][$id.'_t'] > 0)) $b_new_tank[$id] = $b_tank_name[$id];
-              if ($tanks[count($tanks)-1][$id.'_t'] <> $tanks[0][$id.'_t']) {
+              //if ($tanks[count($tanks)-1][$id.'_t'] <> $tanks[0][$id.'_t']) {
+              if ($tanks[count($tanks)-1][$id.'_t'] <> $tanks[0][$id.'_t'] and $tanks[0][$id.'_t']>0) {
                  $b_played_tanks[$id]['tank'] =  $b_tank_name[$id]['tank'];
                  $b_played_tanks[$id]['nation'] = $val['nation'];
                  $b_played_tanks[$id]['total'] = $tanks[0][$id.'_t'];
@@ -255,6 +256,7 @@ if (count($b_player_all) >1) {
         $effect['lvl'] += $lvl_key*$val['total']/$last['total'];
      $effect['lvl'] = number_format($effect['lvl'], 2, '.', '');
      $eff_rating  = number_format($effect['dmg']*(10/($effect['lvl'] +2 ))*(0.23+2*$effect['lvl']/100) + $effect['des']*0.25*1000 + $effect['spot']*0.15*1000 + log($effect['cap']+1,1.732)*0.15*1000 + $effect['def']*0.15*1000,2, '.', '');
+
      $effect['des2'] = ($first['des'])  / ($first['total']);
      $effect['dmg2'] = ($first['dmg'])  / ($first['total']);
      $effect['spot2'] = ($first['spot']) / ($first['total']);
@@ -266,9 +268,20 @@ if (count($b_player_all) >1) {
      $effect['lvl2'] = number_format($effect['lvl'], 2, '.', '');
      $eff_rating_ = number_format($effect['dmg2']*(10/($effect['lvl2'] +2 ))*(0.23+2*$effect['lvl2']/100) + $effect['des2']*0.25*1000 + $effect['spot2']*0.15*1000 + log($effect['cap2']+1,1.732)*0.15*1000 + $effect['def2']*0.15*1000,2, '.', '');
      $eff_rating2 = number_format($eff_rating - $eff_rating_, 2, '.', '');
+//Tux, add wn6 rating
+//(1240-1040/(MIN(TIER,6))^0.164)*FRAGS+DAMAGE*530/(184*e^(0.24*TIER)+130)+SPOT*125+MIN(DEF,2.2)*100+((185/(0.17+e^((WINRATE-35)*-0.134)))-500)*0.45+(6-MIN(TIER,6))*-60
+     if($effect['lvl'] < 6) { $min6 = $effect['lvl']; } else { $min6 = 6; }
+     if($effect['def'] < 2.2) { $min2 = $effect['def']; } else { $min2 = 2.2; }
+     $eff_wn6 = number_format(((1240-1040/(pow($min6,0.164)))*$effect['des']+$effect['dmg']*530/(184*exp(0.24*$effect['lvl'])+130)+$effect['spot']*125+$min2*100+((185/(0.17+exp((($last['win']/$last['total']*100)-35)*-0.134)))-500)*0.45+(6-$min6)*-60),2, '.', '');
+
+     if($effect['lvl2'] < 6) { $min6 = $effect['lvl2']; } else { $min6 = 6; }
+     if($effect['def2'] < 2.2) { $min2 = $effect['def2']; } else { $min2 = 2.2; }
+     $eff_wn6_ = number_format(((1240-1040/(pow($min6,0.164)))*$effect['des2']+$effect['dmg2']*530/(184*exp(0.24*$effect['lvl2'])+130)+$effect['spot2']*125+$min2*100+((185/(0.17+exp((($first['win']/$first['total']*100)-35)*-0.134)))-500)*0.45+(6-$min6)*-60),2, '.', '');
+     $eff_wn6_delta = number_format($eff_wn6 - $eff_wn6_, 2, '.', '');
+//end changes
      $eff_ratingb = round((log($last['total'])/10)*(($last['averag_exp']*1)+($effect['dmg']*(($last['win']/$last['total'])*2+$effect['des']*0.9+$effect['spot']*0.5+$effect['def']*0.5+$effect['cap']*0.5))),0);
      $eff_ratingb_ = round((log($first['total'])/10)*((($first['averag_exp'])*1)+($effect['dmg2']*((($first['win'])/($first['total']))*2+$effect['des2']*0.9+$effect['spot2']*0.5+$effect['def2']*0.5+$effect['cap2']*0.5))),0);
-     $eff_ratingb2 = $eff_ratingb- $eff_ratingb_;
+     $eff_ratingb2 = $eff_ratingb - $eff_ratingb_;
 
      switch ($eff_rating) {
         case ($eff_rating < 600):
@@ -290,6 +303,27 @@ if (count($b_player_all) >1) {
            $color = '#FF7900';
            break;
      };
+
+    switch ($eff_wn6) {
+        case ($eff_wn6 > 1880):
+            $color_wn6 = '#FF8000';
+            break;
+        case ($eff_wn6 > 1585):
+            $color_wn6 = 'purple';
+            break;
+        case ($eff_wn6 > 1195):
+            $color_wn6 = 'royalblue';
+            break;
+        case ($eff_wn6 > 800):
+            $color_wn6 = 'green';
+            break;
+        case ($eff_wn6 > 435):
+            $color_wn6 = 'slategray';
+            break;
+        default:
+            $color_wn6 = 'red';
+            break;
+    };
 
      switch ($eff_ratingb+1) {
         case ($eff_ratingb > 7294):
@@ -369,6 +403,23 @@ if (count($b_player_all) >1) {
            </tr>
          </tbody>
        </table>
+<table cellspacing="1" cellpadding="1" width="100%" align="center" id="t-table14">
+ <thead>
+ <tr>
+     <th align="center" colspan="2" ><span class="bb" style="border-bottom: 1px dashed #666666; cursor: pointer;" title="<?=$lang['overall_wn6_table'];?>">Рейтинг wn6 (c)</span>
+     <!--<br><a href="#" target="_blank">wn6</a>--></th>
+ </tr>
+ </thead>
+ <tbody>
+ <tr>
+     <td align="center"><font color="<?= $color_wn6; ?>"><?= $eff_wn6; ?></font></td>
+     <td align="center"><?php if ($eff_wn6_delta >  0) echo $darkgreen.'+'.$eff_wn6_delta . $darkend;
+         if ($eff_wn6_delta <  0) echo $darkred . $eff_wn6_delta . $darkend;
+         if ($eff_wn6_delta == 0) echo '0';?>
+     </td>
+ </tr>
+ </tbody>
+</table>
        <table cellspacing="1" cellpadding="1" width="100%" align="center" id="t-table10">
          <thead>
            <tr>
@@ -429,7 +480,7 @@ if (count($b_player_all) >1) {
          <thead>
            <tr>
             <th align="center" colspan="2" ><span class="bb" style="border-bottom: 1px dashed #666666; cursor: pointer;"
-                title="Данный рейтинг не имеет четких показательных границ.">Рейтинг бронесайта (c)</span>
+                title="<?= $lang['overall_brone_table'] ?>">Рейтинг бронесайта (c)</span>
                 <br><a href="http://armor.kiev.ua/wot/" target="_blank">armor.kiev.ua/wot</a></th>
            </tr>
          </thead>

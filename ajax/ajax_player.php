@@ -552,7 +552,8 @@ if($result) { $end = end($result); ?>
       <td class="medalContainer" >
       <?php foreach($result as $val) { ?>
         <div class="clanDiv">
-        <img width="64" height="64" class="hint_small" src="<?=$config['clan_img'].$val['clanids']; ?>/emblem_64x64.png">
+<!--        <img width="64" height="64" class="hint_small" src="--><?//=$config['clan_img'].$val['clanids']; ?><!--/emblem_64x64.png">-->
+            <img width="64" height="64" class="hint_small" src="http://cw.worldoftanks.ru/media/clans/emblems/clans_<?=substr($val['clanids'], 0, 1),'/',$val['clanids']; ?>/emblem_64x64.png">
         <br>
         <a href="http://<?php echo $config['gm_url'].'/community/clans/'.$val['clanids']; ?>/" target="_blank">[<?=$val['clantags']; ?>]</a>
         <br>
