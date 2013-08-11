@@ -1,4 +1,4 @@
-<?php
+<?php 
     /*
     * Project:     Clan Stat
     * License:     Creative Commons - Attribution-Noncommercial-Share Alike 3.0 Unported
