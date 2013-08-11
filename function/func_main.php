@@ -90,11 +90,11 @@
 
                         if(!in_array($val['nation'],$col_tank)) {
                             $sql .= "CREATE TABLE IF NOT EXISTS `col_tank_".$val['nation']."` (
-                            `account_id` INT(12),
+                            `account_id` INT(12) NOT NULL,
                             `up` INT( 12 ) NOT NULL,
                             KEY `up` (`up`) ) ENGINE=MYISAM ROW_FORMAT=DYNAMIC;";
                             $sql .= "CREATE TABLE IF NOT EXISTS `col_rating_tank_".$val['nation']."` (
-                            `account_id` INT(12),
+                            `account_id` INT(12) NOT NULL,
                             `up` INT( 12 ) NOT NULL,
                             KEY `up` (`up`) ) ENGINE=MYISAM ROW_FORMAT=DYNAMIC;";
                             $col_tank[] = $val['nation']; //добавляем в массив, дабы не создавать еще раз.
