@@ -98,7 +98,7 @@
     }
     function edit_user($post)
     {
-        global $db,$auth;
+        global $db,$auth,$lang;
         unset($post['edituser']);
         $sql = "SELECT COUNT(id) FROM `users` WHERE user = '".$post['oldname']."';";
         $q = $db->prepare($sql);
@@ -110,6 +110,11 @@
         if($status_user == 1){
             $oldname = $post['oldname'];
             unset($post['oldname']);
+            if(strlen($post['password']) > 12){
+              $message['text'] = $lang['error_toolong'];
+              $message['color'] = 'red';
+              return $message;
+            }
             if(strlen($post['password']) > 0){
                 $post['password'] = $auth->encrypt($post['password']);
             }else{
@@ -134,7 +139,7 @@
             }   
 
         }   
-
+        return '';
     }
     function delete_user($get)
     {
@@ -743,7 +748,7 @@
           }
 
           if(count($tmp)>0) {
-              $roster_id_tmp = implode(',',array_keys($roster_id));
+              $roster_id_tmp = implode(',',$roster_id);
 
               foreach($tmp as $val) {
                 $sql = 'DELETE FROM '.$val.' WHERE account_id NOT IN('.$roster_id_tmp.');';
